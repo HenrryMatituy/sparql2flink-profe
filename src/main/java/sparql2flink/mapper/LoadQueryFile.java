@@ -4,28 +4,31 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 public class LoadQueryFile {
 
     private String queryFile;
 
-    public LoadQueryFile(String queryFile){
-        this.queryFile = queryFile;
-    }
+    public class LoadQueryFile {
+        private final FileSystem fs;
+        private final Path path;
 
-    public String loadSQFile() {
-        String line="", query="";
-        try{
-            File inputFile = new File(queryFile);
-            FileReader in = new FileReader(inputFile);
-            BufferedReader inputStream = new BufferedReader(in);
-            while((line = inputStream.readLine()) != null) {
-                query += line + "\n" ;
-            }
-            in.close();
-        }catch(IOException e) {
-            System.err.format("IOException: %s%n", e);
+        public LoadQueryFile(FileSystem fs, Path path) {
+            this.fs = fs;
+            this.path = path;
         }
-        return query;
+
+        public String loadSQFile() throws IOException {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(path)));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        }
     }
-}
